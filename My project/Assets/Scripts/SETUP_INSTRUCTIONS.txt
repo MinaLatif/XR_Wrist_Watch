@@ -1,0 +1,178 @@
+============================================================
+        META QUEST AR WRIST WATCH - SETUP INSTRUCTIONS
+============================================================
+
+This guide walks you through setting up the AR Wrist Watch app
+in Unity for Meta Quest with passthrough and hand tracking.
+
+------------------------------------------------------------
+STEP 1: ENABLE PASSTHROUGH IN PROJECT SETTINGS
+------------------------------------------------------------
+
+1. Open Unity and go to:
+   Edit > Project Settings > XR Plug-in Management > OpenXR
+
+2. Select the "Android" tab (not Standalone)
+
+3. Under "OpenXR Feature Groups", enable:
+   [x] Meta Quest: Camera (Passthrough)
+
+   Note: "Hand Tracking Subsystem" should already be enabled.
+
+4. Click "Apply" if prompted.
+
+------------------------------------------------------------
+STEP 2: SET UP THE SCENE
+------------------------------------------------------------
+
+Option A: Use the automated setup (Recommended)
+-----------------------------------------------
+1. Open your scene (or create a new one)
+
+2. Delete the default "Main Camera" if present
+
+3. Go to: GameObject > XR > XR Origin (VR)
+   This creates an XR Origin with proper camera setup.
+
+4. Select the Main Camera under XR Origin > Camera Offset
+   - Set "Clear Flags" to "Solid Color"
+   - Set "Background" to (0, 0, 0, 0) - fully transparent
+
+5. Go to: GameObject > XR > Create Hand Tracking Events (Left Hand)
+   This creates the hand tracking event source.
+
+6. Go to: GameObject > XR > Wrist Watch Setup
+   This creates the complete WristWatch prefab.
+
+7. Select the "WristWatch" object and in the Inspector:
+   - Find the "Wrist Tracker" component
+   - Drag "LeftHandTracking" to the "Hand Tracking Events" field
+
+8. Parent the "WristWatch" under the "XR Origin" object
+   (This ensures correct coordinate space)
+
+Option B: Manual setup
+----------------------
+1. Create empty GameObject named "WristWatch"
+2. Add components: WristTracker, TrackingLostHandler
+3. Create World Space Canvas as child (scale: 0.001)
+4. Add TimeDisplay to canvas, wire up TextMeshPro elements
+5. Create tracking lost panel with message
+6. Wire up all references and events
+
+------------------------------------------------------------
+STEP 3: CONFIGURE HAND TRACKING
+------------------------------------------------------------
+
+The LeftHandTracking object has an XRHandTrackingEvents component:
+
+- Handedness: Left (tracks left wrist)
+- Update Type: Dynamic (updates with game loop)
+
+The WristTracker component settings:
+- Position Offset: (0, 0.02, 0) - 2cm above wrist
+- Rotation Offset: (-90, 0, 180) - faces upward
+- Enable Smoothing: true (reduces jitter)
+- Smooth Speed: 20 (adjust if too fast/slow)
+
+------------------------------------------------------------
+STEP 4: BUILD FOR QUEST
+------------------------------------------------------------
+
+1. Go to: File > Build Settings
+
+2. Switch Platform to "Android" if not already
+
+3. Click "Player Settings" and configure:
+   - Company Name: Your company
+   - Product Name: Wrist Watch
+   - Minimum API Level: Android 10.0 (API level 29)
+   - Target Architectures: ARM64 only
+
+4. Connect your Quest via USB or use Air Link
+
+5. Click "Build and Run"
+
+------------------------------------------------------------
+STEP 5: TESTING
+------------------------------------------------------------
+
+On Quest:
+1. Launch the app
+2. You should see passthrough (real environment)
+3. Hold your left hand in view - watch appears on wrist
+4. Move hand around - watch follows
+5. Hide hand - "Move hand into view" message appears
+6. Show hand again - watch reappears
+
+In Editor (with Quest Link):
+1. Connect Quest via Quest Link
+2. Enter Play mode in Unity
+3. Hand tracking should work in VR preview
+
+------------------------------------------------------------
+TROUBLESHOOTING
+------------------------------------------------------------
+
+Watch not appearing:
+- Check XRHandTrackingEvents is assigned to WristTracker
+- Verify hand tracking is enabled in Quest settings
+- Check Console for error messages
+
+Black screen (no passthrough):
+- Verify "Meta Quest: Camera (Passthrough)" is enabled
+- Check camera background is transparent (0,0,0,0)
+- Ensure XR Origin is in the scene
+
+Jittery tracking:
+- Increase "Smooth Speed" in WristTracker
+- Or disable smoothing if XR Hands filtering is sufficient
+
+Watch clipping through arm:
+- Increase Position Offset Y value (try 0.03 or 0.04)
+
+Time not updating:
+- Check TimeDisplay has TMP references assigned
+- Verify Update Interval is reasonable (0.5 seconds)
+
+------------------------------------------------------------
+FILE STRUCTURE
+------------------------------------------------------------
+
+Assets/
+├── Scripts/
+│   ├── WristTracker.cs         - Wrist joint tracking
+│   ├── TimeDisplay.cs          - Time/date rendering
+│   ├── TrackingLostHandler.cs  - Fallback UI handling
+│   └── Editor/
+│       └── WristWatchSetup.cs  - Editor menu utilities
+
+------------------------------------------------------------
+CUSTOMIZATION
+------------------------------------------------------------
+
+Time Format:
+- Edit TimeDisplay component's "Time Format" field
+- "h:mm tt" = 1:30 PM (12-hour)
+- "HH:mm" = 13:30 (24-hour)
+
+Date Format:
+- Edit "Date Format" field
+- "ddd, MMM d" = Mon, Jan 19
+- "dddd, MMMM d" = Monday, January 19
+
+Watch Position:
+- Adjust "Position Offset" in WristTracker
+- X = left/right, Y = up/down, Z = forward/back
+
+Watch Size:
+- Modify WatchCanvas scale (default: 0.001)
+- Smaller scale = smaller watch
+
+Colors/Fonts:
+- Edit the TextMeshPro components directly
+- Background color in the Image component
+
+============================================================
+                     ENJOY YOUR WATCH!
+============================================================
